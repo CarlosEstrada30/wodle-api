@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import { GameModule } from './game/game.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
         entities: [__dirname + '/../**/*.entity.js'],
         synchronize: false,
         migrationsTableName: "migrations",
+        autoLoadEntities: true,
         migrations: ["src/database/migrations/*.ts"],
         cli: {
           migrationsDir: "src/database/migrations"
@@ -25,7 +27,8 @@ import {TypeOrmModule} from '@nestjs/typeorm';
       }),
       inject: [ConfigService],
     }),
-    UsersModule],
+    UsersModule,
+    GameModule],
   controllers: [],
   providers: [],
 })

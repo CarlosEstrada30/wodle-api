@@ -1,13 +1,16 @@
 import { DataSource } from "typeorm";
-import {User} from "../entity/user.entity"
+import {User, Game} from "../entity"
+import { ConfigService } from "@nestjs/config";
+
+require('dotenv').config()
 export const AppDataSource = new DataSource({
     type: 'postgres',
-    host: 'localhost',
-    port: 9999,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'wordle',
-    entities: [User],
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    entities: [User, Game],
     synchronize: true,
     migrations: ["./src/migrations/*.ts"],
 })

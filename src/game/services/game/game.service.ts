@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import e from 'express';
-import { Game } from 'src/entity';
+import { Game, UserWord } from 'src/entity';
 import { UsersService } from 'src/users/services/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -9,7 +9,8 @@ import { Repository } from 'typeorm';
 export class GameService {
     constructor(
         @InjectRepository(Game) private readonly gameRepository: Repository<Game>,
-        private userService: UsersService
+        @InjectRepository(UserWord) private readonly userWordRepository: Repository<UserWord>,
+        private userService: UsersService,
       ) {}
           
       findAll(){
@@ -35,6 +36,7 @@ export class GameService {
         let result: any = []
         let win: boolean = true
         if (game.count < 5 && game.win == false){
+            let record = 0
             for(let letter of body.user_word){
                 let value = 3
                 if (game.word.includes(letter)){
@@ -51,10 +53,16 @@ export class GameService {
                     letter: letter,
                     value: value
                 })
+                record = record+value
             }
             game.count += 1;
             game.win = win
             this.gameRepository.save(game)
+            let user_word = new UserWord()
+            user_word.word = body.user_word
+            user_word.game = game
+            user_word.record = record
+            this.userWordRepository.save(user_word)
         }
         return {count: game.count, win: game.win, result: result}
       }

@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm";
-import {User, Game} from "../entity"
+import {User, Game, UserWord} from "../entity"
 import { ConfigService } from "@nestjs/config";
 
 require('dotenv').config()
@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    entities: [User, Game],
+    entities: [User, Game, UserWord],
     synchronize: true,
     migrations: ["./src/migrations/*.ts"],
 })

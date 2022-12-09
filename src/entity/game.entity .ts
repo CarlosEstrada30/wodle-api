@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import {User} from './user.entity'
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
+import {User, UserWord} from '../entity'
 
 @Entity()
 export class Game {
@@ -29,6 +29,8 @@ export class Game {
   @ManyToOne(() => User, (user) => user.games)
   user: User;
 
+  @OneToMany(() => UserWord, (user_word) => user_word.game)
+  user_words: UserWord[]
   
 
 }

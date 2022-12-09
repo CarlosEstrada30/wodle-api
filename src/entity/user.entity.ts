@@ -1,10 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, Generated } from 'typeorm';
 import {Game} from './game.entity '
 
 @Entity()
 export class User {
+
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  @Generated("uuid")
+  token: string;
 
   @Column({
     nullable: false,

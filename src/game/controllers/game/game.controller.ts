@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
 import {GameService} from 'src/game/services/game/game.service'
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/game')
 export class GameController {
@@ -10,14 +11,15 @@ export class GameController {
         return this.gameService.findAll();
     }
 
+    @UseGuards(AuthGuard('jwt'))
     @Post("/start")
-    create(@Body() body: any){
-        return this.gameService.create(body)
+    create(@Req() request: any){
+        return this.gameService.create(request.user.token)
     }
 
     @Post("/user-word")
-    userWord(@Body() body: any){
-        return this.gameService.userWord(body)
+    userWord(@Body() body: any, @Req() request: any){
+        return this.gameService.userWord(body, request.user.token)
     }
 
 

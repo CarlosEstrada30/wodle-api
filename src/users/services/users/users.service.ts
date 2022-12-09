@@ -8,6 +8,12 @@ export class UsersService {
     constructor(
         @InjectRepository(User) private readonly userRepository: Repository<User>
       ) {}
+
+      async getUser({ username , password }): Promise<User | undefined> {
+        return this.userRepository.findOneBy({username: username,
+          password: password,
+        });
+      }
           
       findAll(){
         return this.userRepository.find()
@@ -22,7 +28,10 @@ export class UsersService {
         return this.userRepository.save(user)
       }
 
-      async findUsersByEmail(email: string) {
-        return await this.userRepository.findOneBy({email: email});
+      async findUsersByToken(token: string) {
+        if(token){
+          return await this.userRepository.findOneBy({token: token});
+        }
+        return null
       }
 }

@@ -71,7 +71,7 @@ export class GameService {
         const fs = require('fs');
         const path = require("path");
         try {
-        const data = await fs.readFileSync(path.resolve(__dirname, "../../../../words.txt"), 'utf8');
+        const data = await fs.readFileSync(path.resolve(__dirname, "../../../words.txt"), 'utf8');
         // mess up the dictionary of words
         const array_words = data.split(/\r?\n/).sort(await function() {return Math.random() - 0.5});
         for (const line of array_words) {

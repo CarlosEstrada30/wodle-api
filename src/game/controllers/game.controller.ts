@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards, Req } from '@nestjs/common';
-import {GameService} from 'src/game/services/game/game.service'
+import {GameService} from 'src/game/services/game.service'
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('api/game')

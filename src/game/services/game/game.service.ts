@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import e from 'express';
-import { Game, UserWord } from 'src/entity';
+import { Game, User, UserWord } from 'src/entity';
 import { UsersService } from 'src/users/services/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -21,22 +20,23 @@ export class GameService {
         return this.gameRepository.findOneBy({id: id});
       }
 
-      async create(body: any){
-        console.log(body)
-        const user = await this.userService.findUsersByEmail(body.email);
+      async create(email_user: any){
+        const user = await this.userService.findUsersByEmail(email_user);
+        let word = await this.getRandomWord(user)
         let game = new Game;
-        game.word = "newword";
+        game.word = word;
         game.user = user;
         return this.gameRepository.save(game)
       }
 
       async userWord(body: any){
         const user = await this.userService.findUsersByEmail(body.email);
+        // get the last game of user
         const game = await this.gameRepository.findOne({where: {userId: user.id}, order: { id: 'DESC' }})
         let result: any = []
         let win: boolean = true
         if (game.count < 5 && game.win == false){
-            let record = 0
+            let record = 0 
             for(let letter of body.user_word){
                 let value = 3
                 if (game.word.includes(letter)){
@@ -66,4 +66,28 @@ export class GameService {
         }
         return {count: game.count, win: game.win, result: result}
       }
+
+     async getRandomWord(user: User) {
+        const fs = require('fs');
+        const path = require("path");
+        try {
+        const data = await fs.readFileSync(path.resolve(__dirname, "../../../../words.txt"), 'utf8');
+        const array_words = data.split(/\r?\n/).sort(await function() {return Math.random() - 0.5});
+        for (const line of array_words) {
+            console.log(`${line} ${line.length}`);
+            if (line.length == 5){
+                const exist = await this.gameRepository.findOne({where: {word: line, userId: user.id}})
+                console.log(`Item ${exist}`)
+                if(!exist){
+                    console.log("entra a asignar")
+                    return line
+                }
+            }
+          }
+        } catch (err) {
+        console.error(err);
+        }
+        return null
+      }
+      
 }

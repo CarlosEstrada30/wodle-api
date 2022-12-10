@@ -19,7 +19,7 @@ export class Game {
   count: number
 
   @Column({ nullable: false })
-    userId: number;
+  userId: number;
 
   @ManyToOne(() => User, (user) => user.games)
   user: User;

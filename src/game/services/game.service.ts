@@ -12,14 +12,9 @@ export class GameService {
         @InjectRepository(Word) private readonly wordRepository: Repository<Word>,
         private userService: UsersService,
       ) {}
-          
-      findAll(){
-        return this.gameRepository.find()
-      }
 
-      topUsers(){
-        return this.gameRepository.find()
-
+      async topWiners(){
+        return this.userService.topWiners()
       }
           
       findUsersById(id: number) {

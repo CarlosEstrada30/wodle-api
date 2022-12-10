@@ -34,4 +34,15 @@ export class UsersService {
         }
         return null
       }
+
+      async topWiners(){
+        const result = await this.userRepository.createQueryBuilder('user')
+        .select('token, username, Count(token) win')
+        .innerJoin("user.games", "game")
+        .where('game.win = :win', { win: true})
+        .groupBy('token, username')
+        .orderBy("win", 'DESC')
+        .limit(10).getRawMany()
+        return result
+      }
 }

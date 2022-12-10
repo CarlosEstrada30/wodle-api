@@ -7,12 +7,6 @@ export class GameController {
     constructor(private gameService: GameService){}
 
     @UseGuards(AuthGuard('jwt'))
-    @Get()
-    getAll(){
-        return this.gameService.findAll();
-    }
-
-    @UseGuards(AuthGuard('jwt'))
     @Post("/start")
     create(){
         return this.gameService.create()
@@ -25,9 +19,9 @@ export class GameController {
     }
 
     @UseGuards(AuthGuard('jwt'))
-    @Post("/users")
+    @Get("/winers")
     topUsers(){
-        return this.gameService.userWord()
+        return this.gameService.topWiners()
     }
 
 

@@ -1,15 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany } from 'typeorm';
-import {User, UserWord} from '../entity'
+import { Column, Entity, PrimaryGeneratedColumn,ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {User, UserWord, Word} from '../entity'
 
 @Entity()
 export class Game {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({
-    nullable: false,
-  })
-  word: string;
 
   @Column({
     nullable: false,
@@ -31,6 +26,10 @@ export class Game {
 
   @OneToMany(() => UserWord, (user_word) => user_word.game)
   user_words: UserWord[]
+
+  @ManyToOne(() => Word, (word) => word.games)
+  @JoinColumn()
+  word: Word
   
 
 }

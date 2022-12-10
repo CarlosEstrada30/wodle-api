@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Game, User, UserWord } from 'src/entity';
+import { Game, User, UserWord, Word } from 'src/entity';
 import { UsersService } from 'src/users/services/users/users.service';
 import { Repository } from 'typeorm';
 
@@ -9,38 +9,48 @@ export class GameService {
     constructor(
         @InjectRepository(Game) private readonly gameRepository: Repository<Game>,
         @InjectRepository(UserWord) private readonly userWordRepository: Repository<UserWord>,
+        @InjectRepository(Word) private readonly wordRepository: Repository<Word>,
         private userService: UsersService,
       ) {}
           
       findAll(){
         return this.gameRepository.find()
       }
+
+      topUsers(){
+        return this.gameRepository.find()
+
+      }
           
       findUsersById(id: number) {
         return this.gameRepository.findOneBy({id: id});
       }
 
-      async create(user_token: any){
-        const user = await this.userService.findUsersByToken(user_token);
-        let word = await this.getRandomWord(user)
-        let game = new Game;
-        game.word = word;
-        game.user = user;
-        return this.gameRepository.save(game)
+      async create(){
+        let word = await this.getRandomWord()
+        let new_word = new Word;
+        new_word.word = word;
+        return this.wordRepository.save(new_word)
       }
 
       async userWord(body: any, user_token){
         const user = await this.userService.findUsersByToken(user_token);
         // get the last game of user
-        const game = await this.gameRepository.findOne({where: {userId: user.id}, order: { id: 'DESC' }})
+        const play_word = await this.wordRepository.findOne({where: {}, order: { id: 'DESC' }}) 
+        try {
+          var game = await this.gameRepository.findOneOrFail({where: {userId: user.id, word: play_word}, relations: ['word']})
+        } catch (EntityNotFoundError) { 
+          game = await this.gameRepository.create({user: user, word: play_word})
+          await this.gameRepository.save(game)
+          game = await this.gameRepository.findOneOrFail({where: {userId: user.id, word: play_word}, relations: ['word']})
+        }
         let result: any = []
         let win: boolean = true
         if (game.count < 5 && game.win == false){
-            let record = 0 
             for(let letter of body.user_word){
                 let value = 3
-                if (game.word.includes(letter)){
-                    if (game.word.indexOf(letter) == body.user_word.indexOf(letter)){
+                if (game.word.word.includes(letter)){
+                    if (game.word.word.indexOf(letter) == body.user_word.indexOf(letter)){
                         value = 1
                     }else{
                         value = 2
@@ -53,7 +63,6 @@ export class GameService {
                     letter: letter,
                     value: value
                 })
-                record = record+value
             }
             game.count += 1;
             game.win = win
@@ -61,13 +70,12 @@ export class GameService {
             let user_word = new UserWord()
             user_word.word = body.user_word
             user_word.game = game
-            user_word.record = record
             this.userWordRepository.save(user_word)
         }
         return {count: game.count, win: game.win, result: result}
       }
 
-     async getRandomWord(user: User) {
+     async getRandomWord() {
         const fs = require('fs');
         const path = require("path");
         try {
@@ -76,7 +84,7 @@ export class GameService {
         const array_words = data.split(/\r?\n/).sort(await function() {return Math.random() - 0.5});
         for (const line of array_words) {
             if (line.length == 5){
-                const exist = await this.gameRepository.findOne({where: {word: line, userId: user.id}})
+                const exist = await this.wordRepository.findOne({where: {word: line}})
                 if(!exist){
                     return line
                 }

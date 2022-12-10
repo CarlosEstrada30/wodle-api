@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 export class GameController {
     constructor(private gameService: GameService){}
 
+    @UseGuards(AuthGuard('jwt'))
     @Get()
     getAll(){
         return this.gameService.findAll();
@@ -13,13 +14,20 @@ export class GameController {
 
     @UseGuards(AuthGuard('jwt'))
     @Post("/start")
-    create(@Req() request: any){
-        return this.gameService.create(request.user.token)
+    create(){
+        return this.gameService.create()
     }
 
-    @Post("/user-word")
+    @UseGuards(AuthGuard('jwt'))
+    @Post("/play")
     userWord(@Body() body: any, @Req() request: any){
         return this.gameService.userWord(body, request.user.token)
+    }
+
+    @UseGuards(AuthGuard('jwt'))
+    @Post("/users")
+    topUsers(){
+        return this.gameService.userWord()
     }
 
 

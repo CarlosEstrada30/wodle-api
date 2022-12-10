@@ -11,14 +11,6 @@ export class UserWord {
   })
   word: string;
 
-  @Column({
-    nullable: false,
-  })
-  record: number
-
-  @Column({ nullable: false })
-  gameId: number;
-
   @ManyToOne(() => Game, (game) => game.user_words)
   game: Game;
 

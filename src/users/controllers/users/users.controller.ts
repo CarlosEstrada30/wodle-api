@@ -1,5 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import {UsersService} from 'src/users/services/users/users.service'
+import { ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+
+@ApiTags('Users')
 @Controller('api/users')
 export class UsersController {
     
